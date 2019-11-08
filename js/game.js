@@ -166,17 +166,22 @@ function create() {
     .setOrigin(0, 0);
   highScorePic.setScrollFactor(0);
 
-  scoreText = this.add.text(175, 58, score, {
+  scoreText = this.add.text(140, 58, score, {
     fontSize: '20px',
     fill: '#ffffff'
   });
   scoreText.setScrollFactor(0);
 
-  highScoreText = this.add.text(705, 58, highScore, {
+  highScoreText = this.add.text(675, 58, highScore, {
     fontSize: '20px',
     fill: '#ffffff'
   });
   highScoreText.setScrollFactor(0);
+}
+
+function updateText() {
+  scoreText.setText(score);
+  highScoreText.setText(highScore);
 }
 
 function update() {
@@ -184,6 +189,8 @@ function update() {
   if (this.player.x > 400)
     backgroundImage.x += 3;
   this.player.x += 5;
+  score += 1;
+  updateText();
   // if (this.cursors.left.isDown) {
   //   this.player.setVelocityX(-400);
   //   // if (this.player.body.onFloor()) {
@@ -236,6 +243,9 @@ function update() {
 function playerHit(player, obstacle) {
   // Set velocity back to 0
   player.setVelocity(0, 0);
+  if (score > highScore)
+    highScore = score;
+  score = 0;
   // Put the player back in its original position
   player.setX(50);
   player.setY(300);
