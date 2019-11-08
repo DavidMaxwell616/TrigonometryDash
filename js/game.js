@@ -22,8 +22,15 @@ const config = {
   },
 };
 
+let isJumping = false;
 const game = new Phaser.Game(config);
 let backgroundImage;
+var score = 0;
+var scoreText;
+var highScore = 0;
+var highScoreText;
+var scorePic;
+var highScorePic;
 
 function preload() {
   // Image layers from Tiled can't be exported to Phaser 3 (as yet)
@@ -35,7 +42,13 @@ function preload() {
   // Even though we load the tilesheet with the obstacle image, we need to
   // load the obstacle image separately for Phaser 3 to render it
 
-  this.load.image('obstacles', 'assets/images/obstacles.png');
+  this.load.image('score', 'assets/images/score.png');
+  this.load.image('highscore', 'assets/images/HighScore.png');
+
+  this.load.spritesheet('obstacles', 'assets/images/obstacles.png', {
+    frameWidth: 64,
+    frameHeight: 64,
+  });
   // Load the export Tiled JSON
   this.load.tilemapTiledJSON('map', 'assets/tilemaps/level1.json');
 
@@ -106,10 +119,11 @@ function create() {
   var camera = this.cameras.main;
   camera.setBounds(0, -500, map.widthInPixels, map.heightInPixels);
   camera.startFollow(this.player);
-  camera.setFollowOffset(this.player.x - 200, this.player.y - 100);
+  camera.setFollowOffset(this.player.x - 200, this.player.y - 150);
   // Enable user input via cursor keys
   this.cursors = this.input.keyboard.createCursorKeys();
 
+  tint = Math.random() * 0xffffff;
   // Create a sprite group for all obstacles, set common properties to ensure that
   // sprites in the group don't move via gravity or by player collisions
   this.obstacles = this.physics.add.group({
@@ -117,6 +131,7 @@ function create() {
     immovable: true,
   });
 
+  var objTileset = map.getTileset('obstacles');
   // Get the obstacles from the object layer of our Tiled map. Phaser has a
   // createFromObjects function to do so, but it creates sprites automatically
   // for us. We want to manipulate the sprites a bit before we use them
@@ -126,8 +141,8 @@ function create() {
     const obstacle = this.obstacles
       .create(
         obstacleObject.x,
-        obstacleObject.y + 200 - obstacleObject.height,
-        'obstacle',
+        obstacleObject.y - 500 - obstacleObject.height,
+        'obstacles'
       )
       .setOrigin(0, 0);
     // By default the sprite has loads of whitespace from the base image, we
@@ -136,33 +151,62 @@ function create() {
     obstacle.body
       .setSize(obstacle.width, obstacle.height - 20)
       .setOffset(0, 20);
+    obstacle.setFrame(obstacleObject.gid - objTileset.firstgid);
   });
-
   // Add collision between the player and the obstacles
   this.physics.add.collider(this.player, this.obstacles, playerHit, null, this);
+
+  scorePic = this.add
+    .image(50, 50, 'score')
+    .setOrigin(0, 0);
+  scorePic.setScrollFactor(0);
+
+  highScorePic = this.add
+    .image(550, 50, 'highscore')
+    .setOrigin(0, 0);
+  highScorePic.setScrollFactor(0);
+
+  scoreText = this.add.text(175, 58, score, {
+    fontSize: '20px',
+    fill: '#ffffff'
+  });
+  scoreText.setScrollFactor(0);
+
+  highScoreText = this.add.text(705, 58, highScore, {
+    fontSize: '20px',
+    fill: '#ffffff'
+  });
+  highScoreText.setScrollFactor(0);
 }
 
 function update() {
   // Control the player with left or right keys
-  if (this.cursors.left.isDown) {
-    this.player.setVelocityX(-400);
-    // if (this.player.body.onFloor()) {
-    //   this.player.play('walk', true);
-    // }
-  } else if (this.cursors.right.isDown) {
-    this.player.setVelocityX(400);
-    // if (this.player.body.onFloor()) {
-    //   this.player.play('walk', true);
-    // }
-  } else {
-    // If no keys are pressed, the player keeps still
-    this.player.setVelocityX(0);
-    // Only show the idle animation if the player is footed
-    // If this is not included, the player would look idle while jumping
-    // if (this.player.body.onFloor()) {
-    //   this.player.play('idle', true);
-    // }
-  }
+  if (this.player.x > 400)
+    backgroundImage.x += 3;
+  this.player.x += 5;
+  // if (this.cursors.left.isDown) {
+  //   this.player.setVelocityX(-400);
+  //   // if (this.player.body.onFloor()) {
+  //   //   this.player.play('walk', true);
+  //   // }
+  // } else if (this.cursors.right.isDown) {
+  //   this.player.setVelocityX(400);
+  //   // if (this.player.body.onFloor()) {
+  //   //   this.player.play('walk', true);
+  //   // }
+  // } else {
+  //   // If no keys are pressed, the player keeps still
+  //   this.player.setVelocityX(0);
+  //   // Only show the idle animation if the player is footed
+  //   // If this is not included, the player would look idle while jumping
+  //   // if (this.player.body.onFloor()) {
+  //   //   this.player.play('idle', true);
+  //   // }
+  // }
+  if (this.player.body.onFloor())
+    this.player.angle = 0;
+  else
+    this.player.angle += 3;
 
   // Player can jump while walking any direction by pressing the space bar
   // or the 'UP' arrow
@@ -171,6 +215,7 @@ function update() {
     this.player.body.onFloor()
   ) {
     this.player.setVelocityY(-350);
+    //  isJumping = true;
     // this.player.play('jump', true);
   }
 
