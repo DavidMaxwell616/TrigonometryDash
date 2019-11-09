@@ -31,6 +31,7 @@ var highScore = 0;
 var highScoreText;
 var scorePic;
 var highScorePic;
+var pointer;
 
 function preload() {
   // Image layers from Tiled can't be exported to Phaser 3 (as yet)
@@ -142,7 +143,7 @@ function create() {
       .create(
         obstacleObject.x,
         obstacleObject.y - 500 - obstacleObject.height,
-        'obstacles'
+        'obstacles',
       )
       .setOrigin(0, 0);
     // By default the sprite has loads of whitespace from the base image, we
@@ -151,32 +152,32 @@ function create() {
     obstacle.body
       .setSize(obstacle.width, obstacle.height - 20)
       .setOffset(0, 20);
-    obstacle.setFrame(obstacleObject.gid - objTileset.firstgid);
+    var frame = obstacleObject.gid - objTileset.firstgid;
+    obstacle.setFrame(frame);
+    obstacle.spike = objTileset.tileProperties[frame];
   });
   // Add collision between the player and the obstacles
   this.physics.add.collider(this.player, this.obstacles, playerHit, null, this);
 
-  scorePic = this.add
-    .image(50, 50, 'score')
-    .setOrigin(0, 0);
+  scorePic = this.add.image(50, 50, 'score').setOrigin(0, 0);
   scorePic.setScrollFactor(0);
 
-  highScorePic = this.add
-    .image(550, 50, 'highscore')
-    .setOrigin(0, 0);
+  highScorePic = this.add.image(550, 50, 'highscore').setOrigin(0, 0);
   highScorePic.setScrollFactor(0);
 
   scoreText = this.add.text(140, 58, score, {
     fontSize: '20px',
-    fill: '#ffffff'
+    fill: '#ffffff',
   });
   scoreText.setScrollFactor(0);
 
   highScoreText = this.add.text(675, 58, highScore, {
     fontSize: '20px',
-    fill: '#ffffff'
+    fill: '#ffffff',
   });
   highScoreText.setScrollFactor(0);
+
+  pointer = this.input.activePointer;
 }
 
 function updateText() {
@@ -186,65 +187,27 @@ function updateText() {
 
 function update() {
   // Control the player with left or right keys
-  if (this.player.x > 400)
-    backgroundImage.x += 3;
+  if (this.player.x > 400) backgroundImage.x += 13;
   this.player.x += 5;
   score += 1;
   updateText();
-  // if (this.cursors.left.isDown) {
-  //   this.player.setVelocityX(-400);
-  //   // if (this.player.body.onFloor()) {
-  //   //   this.player.play('walk', true);
-  //   // }
-  // } else if (this.cursors.right.isDown) {
-  //   this.player.setVelocityX(400);
-  //   // if (this.player.body.onFloor()) {
-  //   //   this.player.play('walk', true);
-  //   // }
-  // } else {
-  //   // If no keys are pressed, the player keeps still
-  //   this.player.setVelocityX(0);
-  //   // Only show the idle animation if the player is footed
-  //   // If this is not included, the player would look idle while jumping
-  //   // if (this.player.body.onFloor()) {
-  //   //   this.player.play('idle', true);
-  //   // }
-  // }
-  if (this.player.body.onFloor())
-    this.player.angle = 0;
-  else
-    this.player.angle += 3;
 
-  // Player can jump while walking any direction by pressing the space bar
-  // or the 'UP' arrow
-  if (
-    (this.cursors.space.isDown || this.cursors.up.isDown) &&
+  if (this.player.body.onFloor()) this.player.angle = 0;
+  else this.player.angle += 3;
+
+  if ((this.cursors.space.isDown || pointer.isDown || this.cursors.up.isDown) &&
     this.player.body.onFloor()
   ) {
     this.player.setVelocityY(-350);
-    //  isJumping = true;
-    // this.player.play('jump', true);
-  }
-
-  // If the player is moving to the right, keep them facing forward
-  if (this.player.body.velocity.x > 0) {
-    this.player.setFlipX(false);
-  } else if (this.player.body.velocity.x < 0) {
-    // otherwise, make them face the other side
-    this.player.setFlipX(true);
   }
 }
 
-/**
- * playerHit resets the player's state when it dies from colliding with a obstacle
- * @param {*} player - player sprite
- * @param {*} obstacle - obstacle player collided with
- */
 function playerHit(player, obstacle) {
+  if (!obstacle.spike.spike)
+    return;
   // Set velocity back to 0
   player.setVelocity(0, 0);
-  if (score > highScore)
-    highScore = score;
+  if (score > highScore) highScore = score;
   score = 0;
   // Put the player back in its original position
   player.setX(50);
