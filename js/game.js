@@ -36,6 +36,7 @@ var pointer;
 function preload() {
   this.load.image('tiles', 'assets/tilesets/grounds.png');
   this.load.image('score', 'assets/images/score.png');
+  this.load.image('portal', 'assets/images/portal.png');
   this.load.image('highscore', 'assets/images/HighScore.png');
   this.load.spritesheet('obstacles', 'assets/images/obstacles.png', {
     frameWidth: 64,
@@ -123,7 +124,7 @@ function create() {
     if (obstacle.spike != null && !obstacle.spike.spike)
       obstacle.body.enable = false;
   });
-
+  var portalTileset = map.getTileset('portal');
   this.physics.add.collider(this.player, this.obstacles, playerHit, null, this);
   scorePic = this.add.image(50, 50, 'score').setOrigin(0, 0);
   scorePic.setScrollFactor(0);
@@ -176,8 +177,8 @@ function playerHitPlatform(player, platform) {
 }
 
 function playerHit(player, obstacle) {
-  console.log(player);
-  if (!obstacle.spike.spike)
+  console.log(obstacle);
+  if (obstacle.spike != null && !obstacle.spike.spike)
     return;
   resetLevel(player, this);
 }
