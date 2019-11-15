@@ -32,11 +32,11 @@ var highScoreText;
 var scorePic;
 var highScorePic;
 var pointer;
+var gameOver = false;
 
 function preload() {
-  this.load.image('tiles', 'assets/tilesets/grounds.png');
+  this.load.image('tiles', 'assets/images/grounds.png');
   this.load.image('score', 'assets/images/score.png');
-  this.load.image('portal', 'assets/images/portal.png');
   this.load.image('highscore', 'assets/images/HighScore.png');
   this.load.spritesheet('obstacles', 'assets/images/obstacles.png', {
     frameWidth: 64,
@@ -124,7 +124,6 @@ function create() {
     if (obstacle.spike != null && !obstacle.spike.spike)
       obstacle.body.enable = false;
   });
-  var portalTileset = map.getTileset('portal');
   this.physics.add.collider(this.player, this.obstacles, playerHit, null, this);
   scorePic = this.add.image(50, 50, 'score').setOrigin(0, 0);
   scorePic.setScrollFactor(0);
@@ -154,8 +153,9 @@ function updateText() {
 function update() {
   //if (this.player.x > 400) 
   //backgroundImage.x += 13;
-
   this.player.body.setVelocityX(250);
+  if (gameOver)
+    return;
   score += 1;
   updateText();
 
@@ -178,9 +178,27 @@ function playerHitPlatform(player, platform) {
 
 function playerHit(player, obstacle) {
   console.log(obstacle);
-  if (obstacle.spike != null && !obstacle.spike.spike)
+  if (obstacle.spike.spike === "object")
     return;
+  else if (obstacle.spike.spike === "portal") {
+    showWonGame(this);
+    return;
+  }
   resetLevel(player, this);
+}
+
+function showWonGame(game) {
+  var gameOverText = game.add.text(200, 200, 'YAY, YOU WON!!!!!', {
+    fontSize: '50px',
+    fontFamily: 'arial',
+    fill: '#eeeeee',
+  });
+  gameOverText.setScrollFactor(0);
+  if (score > highScore) {
+    highScore = score;
+    updateText();
+  }
+  gameOver = true;
 }
 
 function resetLevel(player, game) {

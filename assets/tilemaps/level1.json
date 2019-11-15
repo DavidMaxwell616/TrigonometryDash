@@ -1589,6 +1589,30 @@
                  "width":64,
                  "x":12288,
                  "y":640
+                }, 
+                {
+                 "gid":116,
+                 "height":64,
+                 "id":229,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":640,
+                 "y":960
+                }, 
+                {
+                 "gid":117,
+                 "height":64,
+                 "id":230,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":640,
+                 "y":1024
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1597,7 +1621,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":227,
+ "nextobjectid":231,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.5",
@@ -1606,7 +1630,7 @@
         {
          "columns":27,
          "firstgid":1,
-         "image":"..\/tilesets\/grounds.png",
+         "image":"..\/images\/grounds.png",
          "imageheight":256,
          "imagewidth":1728,
          "margin":0,
@@ -1683,63 +1707,81 @@
                  "id":0,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":true
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"spike"
                         }]
                 }, 
                 {
                  "id":1,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":true
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"spike"
                         }]
                 }, 
                 {
                  "id":2,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":false
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"object"
                         }]
                 }, 
                 {
                  "id":3,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":false
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"object"
                         }]
                 }, 
                 {
                  "id":4,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":true
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"spike"
                         }]
                 }, 
                 {
                  "id":5,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":true
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"spike"
                         }]
                 }, 
                 {
                  "id":6,
                  "properties":[
                         {
-                         "name":"spike",
-                         "type":"bool",
-                         "value":true
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"spike"
+                        }]
+                }, 
+                {
+                 "id":7,
+                 "properties":[
+                        {
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"portal"
+                        }]
+                }, 
+                {
+                 "id":8,
+                 "properties":[
+                        {
+                         "name":"obstacleType",
+                         "type":"string",
+                         "value":"portal"
                         }]
                 }],
          "tilewidth":64
