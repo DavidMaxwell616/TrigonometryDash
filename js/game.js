@@ -119,9 +119,11 @@ function create() {
       .setSize(obstacle.width, obstacle.height - 20)
       .setOffset(0, 20);
     var frame = obstacleObject.gid - objTileset.firstgid;
+    if (frame < 0)
+      frame = 0;
     obstacle.setFrame(frame);
-    obstacle.spike = objTileset.tileProperties[frame];
-    if (obstacle.spike != null && !obstacle.spike.spike)
+    obstacle.obstacleType = objTileset.tileProperties[frame];
+    if (obstacle.obstacleType != null && obstacle.obstacleType.obstacleType != 'spike')
       obstacle.body.enable = false;
   });
   this.physics.add.collider(this.player, this.obstacles, playerHit, null, this);
@@ -170,17 +172,16 @@ function update() {
 }
 
 function playerHitPlatform(player, platform) {
-
   if (player.body.blocked.right) {
+
     resetLevel(player, this);
   }
 }
 
 function playerHit(player, obstacle) {
-  console.log(obstacle);
-  if (obstacle.spike.spike === "object")
+  if (obstacle.obstacleType.obstacleType === "object")
     return;
-  else if (obstacle.spike.spike === "portal") {
+  else if (obstacle.obstacleType.obstacleType === "portal") {
     showWonGame(this);
     return;
   }
