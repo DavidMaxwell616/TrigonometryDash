@@ -27,7 +27,6 @@ var highScore = 0;
 var highScoreText;
 var scorePic;
 var highScorePic;
-var pointer;
 var gameOver = false;
 
 function preload() {
@@ -87,7 +86,13 @@ function create() {
   this.player.setCollideWorldBounds(true);
 
   this.player.setScale(0.5);
-  this.physics.add.collider(this.player, this.platforms, playerHitPlatform, null, this);
+  this.physics.add.collider(
+    this.player,
+    this.platforms,
+    playerHitPlatform,
+    null,
+    this,
+  );
 
   var camera = this.cameras.main;
   camera.setBounds(0, -500, map.widthInPixels, map.heightInPixels);
@@ -115,11 +120,13 @@ function create() {
       .setSize(obstacle.width, obstacle.height - 20)
       .setOffset(0, 20);
     var frame = obstacleObject.gid - objTileset.firstgid;
-    if (frame < 0)
-      frame = 0;
+    if (frame < 0) frame = 0;
     obstacle.setFrame(frame);
     obstacle.obstacleType = objTileset.tileProperties[frame];
-    if (obstacle.obstacleType != null && obstacle.obstacleType.obstacleType != 'spike')
+    if (
+      obstacle.obstacleType != null &&
+      obstacle.obstacleType.obstacleType != 'spike'
+    )
       obstacle.body.enable = false;
   });
   this.physics.add.collider(this.player, this.obstacles, playerHit, null, this);
@@ -139,8 +146,6 @@ function create() {
     fill: '#ffffff',
   });
   highScoreText.setScrollFactor(0);
-
-  pointer = this.input.activePointer;
 }
 
 function updateText() {
@@ -149,18 +154,18 @@ function updateText() {
 }
 
 function update() {
-  //if (this.player.x > 400) 
+  //if (this.player.x > 400)
   //backgroundImage.x += 13;
   this.player.body.setVelocityX(250);
-  if (gameOver)
-    return;
+  if (gameOver) return;
   score += 1;
   updateText();
 
-  if (this.player.body.onFloor())
-    this.player.angle = 0;
+  if (this.player.body.onFloor()) this.player.angle = 0;
   else this.player.angle += 3;
-  if ((this.cursors.space.isDown || pointer.isDown || this.cursors.up.isDown) &&
+  var pointer = this.input.activePointer;
+  if (
+    (this.cursors.space.isDown || pointer.isDown || this.cursors.up.isDown) &&
     this.player.body.onFloor()
   ) {
     this.player.setVelocityY(-500);
@@ -169,15 +174,13 @@ function update() {
 
 function playerHitPlatform(player, platform) {
   if (player.body.blocked.right) {
-
     resetLevel(player, this);
   }
 }
 
 function playerHit(player, obstacle) {
-  if (obstacle.obstacleType.obstacleType === "object")
-    return;
-  else if (obstacle.obstacleType.obstacleType === "portal") {
+  if (obstacle.obstacleType.obstacleType === 'object') return;
+  else if (obstacle.obstacleType.obstacleType === 'portal') {
     showWonGame(this);
     return;
   }
@@ -218,5 +221,4 @@ function resetLevel(player, game) {
     ease: 'Linear',
     repeat: 5,
   });
-
 }
