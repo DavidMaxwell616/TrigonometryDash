@@ -2,7 +2,7 @@ const config = {
   type: Phaser.AUTO,
   parent: 'game',
   width: 800,
-  height: 600,
+  height: 400,
   scene: {
     preload,
     create,
@@ -20,7 +20,7 @@ const config = {
 
 let isJumping = false;
 const game = new Phaser.Game(config);
-let backgroundImage;
+let backgroundImage = [];
 var score = 0;
 var scoreText;
 var highScore = 0;
@@ -28,6 +28,7 @@ var highScoreText;
 var scorePic;
 var highScorePic;
 var gameOver = false;
+var worldOffsetY = -500;
 
 function preload() {
   this.load.image('tiles', 'assets/images/grounds.png');
@@ -55,16 +56,17 @@ function create() {
   });
   const tileset = map.addTilesetImage('grounds', 'tiles');
   var tint = Math.random() * 0xffffff;
-  for (let index = 0; index <= 22; index++) {
-    backgroundImage = this.add
-      .image(index * 1024, 0, 'background')
+  for (let index = -1; index <= 21; index++) {
+    var background = this.add
+      .sprite(index * 1024, 0, 'background')
       .setOrigin(0, 0);
-    backgroundImage.tint = tint;
+    background.tint = tint;
+    backgroundImage.push(background);
   }
 
   this.physics.world.setBounds(
     0,
-    -500,
+    worldOffsetY,
     map.widthInPixels,
     map.heightInPixels,
     true,
@@ -74,11 +76,11 @@ function create() {
   );
 
   tint = Math.random() * 0xffffff;
-  this.platforms = map.createDynamicLayer('Platforms', tileset, 0, -500);
+  this.platforms = map.createDynamicLayer('Platforms', tileset, 0, worldOffsetY);
   this.platforms.setCollisionByExclusion(-1, true);
   this.platforms.tint = tint;
   var layer = this.platforms;
-
+  console.log(layer);
   tint = Math.random() * 0xffffff;
   this.player = this.physics.add.sprite(50, 300, 'player');
   this.player.setBounce(0.1);
@@ -95,9 +97,9 @@ function create() {
   );
 
   var camera = this.cameras.main;
-  camera.setBounds(0, -500, map.widthInPixels, map.heightInPixels);
+  camera.setBounds(0, worldOffsetY, map.widthInPixels, map.heightInPixels);
   camera.startFollow(this.player);
-  camera.setFollowOffset(this.player.x - 200, this.player.y - 150);
+  camera.setFollowOffset(this.player.x - 200, this.player.y - 220);
   this.cursors = this.input.keyboard.createCursorKeys();
 
   tint = Math.random() * 0xffffff;
@@ -112,7 +114,7 @@ function create() {
     const obstacle = this.obstacles
       .create(
         obstacleObject.x,
-        obstacleObject.y - 500 - obstacleObject.height,
+        obstacleObject.y + worldOffsetY - obstacleObject.height,
         'obstacles',
       )
       .setOrigin(0, 0);
@@ -154,8 +156,12 @@ function updateText() {
 }
 
 function update() {
-  //if (this.player.x > 400)
-  //backgroundImage.x += 13;
+  if (this.player.x > 400) {
+    backgroundImage.forEach(function (bkg) {
+      bkg.x++;
+    });
+  }
+
   this.player.body.setVelocityX(250);
   if (gameOver) return;
   score += 1;
@@ -220,5 +226,8 @@ function resetLevel(player, game) {
     duration: 100,
     ease: 'Linear',
     repeat: 5,
+  });
+  backgroundImage.forEach(function (bkg, index) {
+    bkg.x = index * 1024
   });
 }
